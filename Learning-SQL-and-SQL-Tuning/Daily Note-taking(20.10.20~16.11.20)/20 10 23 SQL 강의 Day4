@@ -1,0 +1,277 @@
+```basic
+select upper(substr(ename,1,1)) || lower(substr(ename,2,@))
+from emp;
+```
+
+> @자리에 어떤 숫자를 써도 상관없음./ 넉넉하게 써도 되고, 안쓰면 그냥 자동으로 끝까지 읽음.
+
+substr( 첫번째 인자값, 두번째 인자값, 세번째 인자값)  / substr 은 '잘라내는 함수'
+
+-> substr(ename, 2, 2) = 김승순 중 승순 만 출력하라!
+
+김    승    순
+
+1     2     3
+
+-3    -2    -1
+
+두번째인자값 = 잘라날 시작 자리 수
+
+세번째인자값 = 시작자리수(두번째인자값)포함해서 잘라낼 철자의 개수
+
+substr 작성시 세번째 인자값에 아무것도 적지 않으면,
+
+e.g)
+
+```basic
+select substr('smith', 1, 3)
+from dual;
+```
+
+dual  은 select 절에 있는 함수의 값을 보기 위한 '가상(dummy)'의 테이블
+
+여기서 dual 대신 emp 쓰면 데이터의 건수만큼 똑같은 값이 나옴
+
+컬럼명을 쓰면 테이블명 (ename 등) 을 써야 하지만
+
+특정 '단어=문자'를 썼기 때문에 'dual' 을 쓴 것.
+
+테이블에서 자료 가져올때는 당연히 emp!
+
+**'dual' 은 공부** **할때** **아니면** **사실상** **거의** **쓸일** **없으니** **그냥** **알아만** **둘** **것!**
+
+If,  맨끝에 있는 철자 하나를 뽑아 쓰려 한다면 음수를 쓰는게 더 효율적.
+
+> 문제 69. 사원 테이블에서 이름을 출력하고 그 옆에 이름의 끝 철자를 출력해라. 이때 끝 철자를 소문자로 출력하시오.
+
+내 생각 : 맞음
+
+```basic
+select ename, lower(substr(ename,-1))
+from emp;
+```
+
+## **019 문자에서 특정 철자의 위치 출력하기(INSTR)**
+
+특정 철자의 자리수를 출력하는 함수
+
+e.g)
+
+```basic
+select instr('smith','m')
+from emp;
+```
+
+smith 에서 m 이 2번째에 있으니까 숫자 2가 나옴.
+
+> e.g) 우리반 테이블에서 이메일을 출력하고 그 옆에 이메일에서 @ 가 몇번째 자리에 있는지 출력하시오.
+
+내 생각 : 맞음.
+
+```basic
+select email, instr(email,'@')
+from emp12;
+```
+
+> i.e) 우리반 테이블에서 이메일에서 @ 앞에까지 의 철자를 잘라내시오.
+
+내 생각 (ename, email 은 맞는지 확인하기 위해 임의로 넣음)
+
+```basic
+select ename, email, substr(email,1,(instr(email,'@')-1))
+from emp12;
+```
+
+오늘의 마지막 문제 (주말내내 풀어보기!)
+
+> 문제 70.  이메일을 출력하고 그 옆에 이메일의 도메인을 출력하시오.
+
+- 도메인 = @gmail.com -> gmail 만 나오게 하는 것.
+
+여태 까지 배운걸로 다 활용하면 풀 수 있음! (늦으면 1시간, 빠르면 10분)
+
+도메인만 출력 = 철자 따오기 substr (따올 컬럼, 시작점, 끝점)
+
+1트
+
+substr(email,(instr(email,'@'))+1,-4))
+
+따올 컬럼 = 이메일
+
+시작점 = 이메일 데이터중 @ 바로 뒤
+
+끝점 = @바로 뒤 부터  .com / .net 을 제외한 것 (뒤에서 4자리)
+
+2트
+
+select email, substr(email,(instr(email,'@'))+1, instr(email,'.'))
+
+from emp12;
+
+이건 뒤에 .com 등이 사라지지 않음. 그나마 이게 제일 답에 가까운 상황.
+
+3트
+
+select email, substr(email,(instr(email,'@'))+1,(instr(email, '.com' or '.net')-1))
+
+from emp12;
+
+는 아닐까 했는데 or 등은 아님 실패!
+
+4트
+
+substr(email,시작할 철자위치출력(instr사용), 끝낼철자위치 출력(instr사용?)
+
+select email, substr(email,(instr(email,'@'))+1),
+
+끝낼 위치가 .com / .net 의 앞까지
+
+맨뒤는
+
+@뒤에 있는 . 바로 1칸앞
+
+맨뒤에서 4칸 앞 (-4)
+
+substr( 출력컬럼, 시작점, 출력시작점 기준으로 잘려나갈 글자의 인수 (위치))
+
+출력 컬럼 : email
+
+출력 시작점 :
+
+은 이메일 길이가 모두 다름 -> 도메인만 출력해야 하니까 '@'바로 뒤가 시작 지점
+
+- > instr 사용
+- > (instr(email,'@'))+1
+
+끝나는 위치의 자리수 :
+
+는 각 데이터 마다 모두 다름 -> 공통점은 ~.net / ~.com 으로 끝남.
+
+(생각중~!)
+
+```basic
+nostelgia18@gmail.com         ||      gmail
+select email, substr(email,instr(email,'@'))+1),0)
+```
+
+시작점 설정은 코딩을 했는데, 끝점 설정을 ㅇㅓ떻게 할지 모르겠다….
+
+**이메일** **데이터에** **나오는** **문자들중** **맨끝에서 4번째까지** **를** **구현해야 함!**
+
+```basic
+select ename, substr(email, instr(email, '@')+1, instr(substr(email, instr(email, '@')+1), '.') -1)
+from emp11
+```
+
+정답!!!!
+
+특정문자를 출력해라 (이메일컬럼에서, @+1 된 지점부터 시작해서, 이메일 컬럼에서 @+1 부터 시작해 '.'의 -1지점까지의 위치까지를)
+
+```basic
+select ename, substr(email, instr(email,'@')+1, instr(substr(email,instr(email,'@')+1),'.')-1)
+from emp12;
+```
+
+substr 로 이메일에서 철자 추출하라. 시작점은 이메일주소 컬럼의 @+1 부터이다.
+
+끝나는 점 (몇자리 냐면)
+
+instr로 글자의 자리수를 출력하라. 어디냐면
+
+## **020 특정** **철자를** **다른** **철자로** **변경하기(REPLACE)**
+
+e.g)
+
+```basic
+select replace('smith','m','k')
+from dual;
+```
+
+replace 문법
+
+replace (컬럼명, 대체 전 문자 or 숫자, 대체 후 문자 or 숫자)
+
+고객데이터를 보유한 기업들은 그 데이터를 모두 암호화를 해야할 의무가있음.
+
+> 문제 71.  사원테이블에서 이름과 월급을 출력하는데, 월급을 출력할때 숫자 0을 별표(*) 로 출력하시오.
+
+내 생각 (반만 맞음)
+
+```basic
+select ename, replace(sal,'0','*')
+from emp;
+```
+
+여기서 '0' 은 사실 숫자여서 ' ' 을 쓸필요가 없음 (나의 실수)
+
+replace 쓴 후에 바꿀 것의 기준을 '컬럼'으로 잡았기 때문에 from emp를 쓰는게 맞음.
+
+> 문제 72. 우리반 테이블에서 이름을 출력하고, 그 옆에 이름의 두번째 철자를 출력하시오.
+
+내 생각
+
+```basic
+select ename, substr(ename, 2, 1)
+from emp12;
+```
+
+> 문제 73. 아산 병원의 전광판을 구현하시오! (김승순 -> 김*순) 으로 나오도록.
+
+내 생각
+
+```basic
+select replace(ename,instr(ename,2,),'*')
+from emp12;
+```
+
+이었는데 틀림
+
+정답!
+
+```basic
+select replace(ename,substr(ename,2,1),'*')
+from emp12;
+```
+
+근데 이건 이름이 2~3글자인 경우에만 적용됨 4글자인 경우 다 티가 남.
+
+e.g) 28번 남*솔미 -> 누가봐도 남궁솔미
+
+> 문제 74. 남궁솔미 데이터를 입력하고, 남궁*미로 출력되게 위의 SQL을 다시 작성하시오.
+
+지금까지 배운걸로  할 수 없어 추후에 다시 할거임~!
+
+```basic
+alter table emp12
+modify ename varchar2(30);
+
+insert into emp12(ename,age)
+
+values('남궁솔미',27);
+
+commit;
+```
+
+select * from emp12;
+
+입력하여 테이블에 데이터 추가한 뒤 문제 풀기!
+
+내 생각
+
+```basic
+select replace(ename,substr(ename,3,1),'*')
+from emp12;
+```
+
+이었는데 이건 이름이 2글자인 사람은 변경이 안됨…...
+
+마이너스를 이용할 것!
+
+만약 2글자가 없다면
+
+```basic
+select replace(ename,substr(ename,-2,1),'*')
+from emp12;
+```
+
+라고 하면 됨.
